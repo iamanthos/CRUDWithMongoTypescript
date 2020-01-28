@@ -5,6 +5,7 @@ import { CRUDController } from './controller/crudController';
 import { requestLoggerMiddleware } from './middleware/request.logger.middleware';
 import { MongoHelper } from '../src/mongo.helper';
 import * as http from 'http';
+import 'reflect-metadata';
 // import cors from 'cors';
 
 const app = express();
