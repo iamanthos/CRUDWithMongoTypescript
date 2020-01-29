@@ -3,13 +3,12 @@ import { JsonController, OnUndefined, Param, Body, Get, Post, Put, Delete, Res, 
 // import { IWeapon } from "../models/Iweapons";
 // import path from "path";
 import { MongoHelper } from '../mongo.helper';
-import { resolve } from "dns";
-import { rejects } from "assert";
+import { Util } from '../util';
 // import * as util from 'util';   //use for displaying circluar Json sample - // return util.inspect(db.databaseName);
 
 // const machine = require(path.resolve("/DevSpace/NodeCRUDApp/src/models/weapon"));
-
-
+const util = new Util();
+let response: any;
 
 @JsonController()
 export class CRUDController {
@@ -25,53 +24,15 @@ export class CRUDController {
         return db.collection('weapon').find({}).toArray();
     }
 
-    @HttpCode(201)
+    @HttpCode(200)
     @Post('/createList')
     // @OnUndefined(404)
-    public CreateList(@Body() req: any,@Res() res: Response){
-        try{
-        let response: any;
-        const db = MongoHelper.client.db('CRUD');
-         const insertedOutput: Promise<any> =
-         db.collection('weapon').insertMany(req);
-
-        insertedOutput.then(resolvedPromise => {
-            if(resolvedPromise.result.ok == 1){
-               response =  {
-                    'statusCode' : '200',
-                    'count' : resolvedPromise.insertedCount,
-                    'id' : resolvedPromise.insertedId
-                }
-
-                console.log('Response ' + JSON  .stringify(response));
-                
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        });
-        res.send(200).json(response);
-        // console.log(res);
+    public async CreateList(@Body() req: any,@Res() res: any){
         
-        }
-        catch(e){
-            console.log(e)
-        }
-
-        // insertedOutput.catch(error => {
-        //     console.log(error);
-        // });
-
-        // console.log('outer '+ response);
-
-        // insertedOutput.then(resolve => {console.log(resolve); return 1 }).catch(err => console.log(err));
-
-        // return response =  {
-        //                 'statusCode' : '200',
-        //                 'count' : 'resolvedPromise.insertedCount',
-        //                 'id' : 'resolvedPromise.insertedId'
-        //             }
-                // });
+        const db = MongoHelper.client.db('CRUD');
+        let promisedDB = db.collection('weapon').insertMany(req);
+        response =  await this.ExecutePromise(promisedDB);
+        return res.send(response.insertedIds)
     }
 
     @Delete('/deleteList')
@@ -86,4 +47,11 @@ export class CRUDController {
 
     }
 
+    private async ExecutePromise(value){
+        let resolvedPromise: any;
+        await value.then((data) => {
+                resolvedPromise = data;
+        });
+        return resolvedPromise;
+    }
 }
