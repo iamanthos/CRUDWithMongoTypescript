@@ -70,3 +70,6 @@ export class MongoHelper {
 //        [{ role: "readWrite", db: "admin" }]
 //   }
 //  )
+
+
+//mongod --config E:\DevSpace\NodeMongoTypescript\mongo.conf
